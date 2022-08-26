@@ -1,55 +1,65 @@
 #include "binary_trees.h"
+/**
+ * min_finder - Finds the minimum root
+ * @root: pointer to the tree
+ * Return: the min number
+ */
+
+bst_t *min_finder(bst_t *root)
+{
+	while (root->left != NULL)
+		root = root->left;
+	return (root);
+}
 
 /**
  * bst_remove - removes a node from a Binary Search Tree
- * @root: a pointer to the root node of the tree where you will remove a node
- * @value: the value to remove in the tree
- * Return: a pointer to the new root node of the tree after removal
- *         NULL on failure
+ *
+ * @root: pointer to the root node of the tree where you will remove a node
+ * @value: value to remove in the tree
+ * Return: pointer to the new root node of the tree
+ * after removing the desired value
  */
+
 bst_t *bst_remove(bst_t *root, int value)
 {
-	bst_t *tmp = NULL;
+	bst_t *temp, *parent;
 
-	if (!root)
+	if (root == NULL)
 		return (NULL);
-
-	if (value < root->n)
+	else if (value < root->n)
 		root->left = bst_remove(root->left, value);
 	else if (value > root->n)
 		root->right = bst_remove(root->right, value);
 	else
 	{
-		if (!root->left)
+		if (root->left == NULL && root->right == NULL)
 		{
-			tmp = root->right;
 			free(root);
-			return (tmp);
+			root = NULL;
 		}
-		else if (!root->right)
+		else if (root->left == NULL)
 		{
-			tmp = root->left;
-			free(root);
-			return (tmp);
+			temp = root;
+			parent = root->parent;
+			root = root->right;
+			root->parent = parent;
+			free(temp);
 		}
-		tmp = bst_min_val(root->right);
-		root->n = tmp->n;
-		root->right = bst_remove(root->right, tmp->n);
+		else if (root->right == NULL)
+		{
+			temp = root;
+			parent = root->parent;
+			root = root->left;
+			root->parent = parent;
+			free(temp);
+		}
+		else
+		{
+			temp = min_finder(root->right);
+			root->n = temp->n;
+			root->right = bst_remove(root->right, temp->n);
+		}
 	}
 	return (root);
-}
-
-/**
- * bst_min_val - finds the smallest node from a Binary Search Tree
- * @root: a pointer to the root node of the tree
- * Return: a pointer to the smallest node
- */
-bst_t *bst_min_val(bst_t *root)
-{
-	bst_t *min = root;
-
-	while (min->left)
-		min = min->left;
-
-	return (min);
 }
